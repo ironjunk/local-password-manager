@@ -109,7 +109,7 @@ def check_master_pass(pass_master):
 # ---------- Scope: Generate {Begin} ---------- #
 
 # func: to generate password
-def generate(w = 1, W = 1, d = 1, s = 1):
+def generate(w = 4, W = 4, d = 3, s = 5):
     
     spcl_char = "#_.@"
 

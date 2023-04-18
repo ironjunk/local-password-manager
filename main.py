@@ -4,10 +4,9 @@
 # ---------- Required Modules
 
 from tkinter import Tk
-from pyperclip import copy
 
 from manager import check_status
-from gui import gui_first_setup
+from gui import gui_first_setup, gui_main_menu
 from getpass import getpass
 
 # ---------- Main
@@ -20,6 +19,8 @@ if __name__ == "__main__":
 
     if not check_status():
         gui_first_setup(root = root)
+    else:
+        gui_main_menu(root = root)
         
 
     # root.grid_rowconfigure(0, weight = 1)
@@ -28,6 +29,7 @@ if __name__ == "__main__":
 
     root.grid_columnconfigure(0, weight = 1)
     root.grid_columnconfigure(1, weight = 1)
+    root.grid_columnconfigure(2, weight = 1)
 
     root.mainloop()
 

@@ -4,6 +4,7 @@
 # ---------- Required Modules
 
 from datetime import datetime
+from pyperclip import copy
 
 import manager as mg
 from tkinter import Label, Entry, Button
@@ -11,7 +12,7 @@ from tkinter import Label, Entry, Button
 # ---------- Functions : Button Click Functions
 
 # func: to store the master password in the DB
-def first_setup(text_field_1 = None, text_field_2 = None, lbl_bottom = None):
+def btn_first_setup(text_field_1 = None, text_field_2 = None, lbl_bottom = None):
     pass_master = text_field_1.get()
     c_pass_master = text_field_2.get()
 
@@ -25,6 +26,19 @@ def first_setup(text_field_1 = None, text_field_2 = None, lbl_bottom = None):
             lbl_bottom.configure(text = f"{datetime.now()} :\nThe Master Password setup failed!\nKindly report to the developer.", fg = 'red')
     else:
         lbl_bottom.configure(text = f"{datetime.now()} :\nThe passwords in both the fields do not match.\nPlease try again.", fg = 'red')
+# ----------
+# func: to generate password
+def btn_generate_password(text_field_1 = None):
+    password = mg.generate()
+
+    text_field_1.delete(0, "end")       # empty field
+    text_field_1.insert(0, password)    # insert into field
+# ----------
+# func: to copy text from the text field
+def btn_copy(text_field_1 = None):
+    text = text_field_1.get()
+
+    copy(text = text)
 
 # ---------- Functions : GUI Renders
 
@@ -55,5 +69,25 @@ def gui_first_setup(root = None):
     lbl_bottom.grid(row = 5, column = 0, columnspan = 2)
 
     btn_bottom = Button(root, text = "Set Master Password",
-                            command = lambda: first_setup(text_field_1 = text_field_1, text_field_2 = text_field_2, lbl_bottom = lbl_bottom))
+                            command = lambda: btn_first_setup(text_field_1 = text_field_1, text_field_2 = text_field_2, lbl_bottom = lbl_bottom))
     btn_bottom.grid(row = 4, column = 0, columnspan = 2)
+# ----------
+# func: to draw the UI for first time setup
+def gui_main_menu(root = None):
+
+    text_field_1 = Entry(root, show = "*")
+    text_field_1.grid(row = 2, column = 0, columnspan = 2)
+
+    btn_cpy = Button(root, text = "Copy",
+                     command = lambda: btn_copy(text_field_1 = text_field_1))
+    btn_cpy.grid(row = 2, column = 3)
+
+    btn_top_1 = Button(root, text = "Generate\nPassword", padx = 20, pady = 20,
+                       command = lambda: btn_generate_password(text_field_1 = text_field_1))
+    btn_top_1.grid(row = 0, column = 0)
+
+    btn_top_2 = Button(root, text = "Store\nPassword", padx = 20, pady = 20)
+    btn_top_2.grid(row = 0, column = 1)
+
+    btn_top_3 = Button(root, text = "Retrieve\nPassword", padx = 20, pady = 20)
+    btn_top_3.grid(row = 0, column = 2)
