@@ -3,7 +3,7 @@
 
 # ---------- Required Modules
 
-from tkinter import Tk
+from tkinter import Tk, PhotoImage
 
 from manager import check_status
 from gui import gui_first_setup, gui_main_menu
@@ -16,6 +16,9 @@ if __name__ == "__main__":
     root = Tk()
     root.title("Local Password Manager")
     root.geometry('500x300')
+
+    favicon = PhotoImage(file = "favicon.png")
+    root.iconphoto(False, favicon)
 
     if not check_status():
         gui_first_setup(root = root)
@@ -30,6 +33,7 @@ if __name__ == "__main__":
     root.grid_columnconfigure(0, weight = 1)
     root.grid_columnconfigure(1, weight = 1)
     root.grid_columnconfigure(2, weight = 1)
+    root.grid_columnconfigure(3, weight = 1)
 
     root.mainloop()
 

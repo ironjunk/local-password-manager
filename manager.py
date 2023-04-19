@@ -106,54 +106,37 @@ def check_master_pass(pass_master):
 # ---------- Scope: Update {Begin} ---------- #
 # ---------- Scope: Update {End} ---------- #
 
-# ---------- Scope: Generate {Begin} ---------- #
+# ---------- Generate Password
 
 # func: to generate password
 def generate(w = 4, W = 4, d = 3, s = 5):
+    # func: to jumble generated password
+    def jumble(gen):
+        
+        jumbled = sample(gen, len(gen))
+        
+        return "".join(jumbled)
     
     spcl_char = "#_.@"
 
     gen = ""
 
-    for i in range(w):
+    for _ in range(w):
         gen = gen + chr(randint(97,122))
 
-    for i in range(W):
+    for _ in range(W):
         gen = gen + chr(randint(65,90))
 
-    for i in range(d):
+    for _ in range(d):
         gen = gen + chr(randint(48,57))
 
-    for i in range(s):
+    for _ in range(s):
         gen = gen + spcl_char[randint(0,2)]
 
     return jumble(gen)
 
-# func: to extract parameter values
-def separate(value):
-    
-    return [int(x) for x in value]
-
-# func: to jumble generated password
-def jumble(gen):
-    
-    jumbled = sample(gen, len(gen))
-    
-    return "".join(jumbled)
-
-# ---------- Scope: Generate {End} ---------- #
-
-# ---------- Scope: Main {Begin} ---------- #
+# ---------- Main
 
 if __name__ == "__main__":
     
-    print("Error : Not a runnable program. \nNote : Run lpm_main.py")
-
-
-    # value = input("Enter Value: ")
-    # w, W, d, s = separate(value)
-    
-    # pswd = generate(w, W, d, s)
-    # print(pswd)
-
-# ---------- Scope: Main {End} ---------- #
+    print("Error\t: Not a runnable program. \nNote\t: Run main.py instead.")
