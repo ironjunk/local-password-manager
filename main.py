@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     root = Tk()
     root.title("Local Password Manager")
-    root.geometry('500x300')
+    root.geometry('500x400')
 
     favicon = PhotoImage(file = "favicon.png")
     root.iconphoto(False, favicon)
