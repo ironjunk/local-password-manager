@@ -6,6 +6,7 @@
 from random import randint, sample
 from sqlite3 import connect
 from passlib.hash import pbkdf2_sha256
+from cryptocode import encrypt, decrypt
 
 # ---------- Database Connection
 
@@ -91,20 +92,71 @@ def check_master_pass(pass_master):
 
     return pbkdf2_sha256.verify(pass_master, key)
 
-# ---------- Scope: Create {Begin} ---------- #
+# ---------- Store Password
 
+# func: to create new admin table
+def create_pass_table():
 
+    conn = connection()
+    c = conn.cursor()
 
-# ---------- Scope: Create {End} ---------- #
+    try:
+        c.execute("create table if not exists password(id text, password text)")
+        conn.commit()
+        conn.close()
+        
+        return True
+    
+    except:
+        print("\nError creating the password table! Kindly report the issue to the developer.")
+        conn.close()
+        
+        return False
+# ----------
+# func: to store the master password
+def store_password(_id = None, password = None, master_password = None):
 
-# ---------- Scope: Store {Begin} ---------- #
+    encrypted_password = encrypt(password, master_password)
 
+    _ = create_pass_table()
 
+    conn = connection()
+    c = conn.cursor()
 
-# ---------- Scope: Store {End} ---------- #
+    try:
+        c.execute("insert into password values(?, ?)", (_id, encrypted_password))
+        conn.commit()
+        conn.close()
 
-# ---------- Scope: Update {Begin} ---------- #
-# ---------- Scope: Update {End} ---------- #
+        return True
+    
+    except:
+        print("\nError inserting record to the password table! Kindly report the issue to the developer.")
+        conn.close()
+    
+        return False
+
+# ---------- Update Password
+# func: to store the master password
+def fetch_ids():
+
+    conn = connection()
+    c = conn.cursor()
+
+    try:
+        c.execute("select id from password")
+        rows = c.fetchall()
+        conn.close()
+
+        id_list = [x[0] for x in rows]
+
+        return sorted(id_list)
+    
+    except:
+        print("\nError inserting record to the password table! Kindly report the issue to the developer.")
+        conn.close()
+    
+        return []
 
 # ---------- Generate Password
 
@@ -138,5 +190,7 @@ def generate(w = 4, W = 4, d = 3, s = 5):
 # ---------- Main
 
 if __name__ == "__main__":
+
+    fetch_ids()
     
     print("Error\t: Not a runnable program. \nNote\t: Run main.py instead.")

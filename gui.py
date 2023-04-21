@@ -7,7 +7,7 @@ from datetime import datetime
 from pyperclip import copy
 
 import manager as mg
-from tkinter import Label, Entry, Button
+from tkinter import Label, Entry, Button, OptionMenu, StringVar
 
 # ---------- Functions : Button Click Functions
 
@@ -44,7 +44,17 @@ def btn_copy_text(text_field_1 = None, lbl_bottom = None):
 # ----------
 # func: to copy text from the text field
 def btn_store_password(text_field_1 = None, text_field_2 = None, text_field_3 = None, lbl_bottom = None):
-    pass
+    _id = text_field_1.get()
+    password = text_field_2.get()
+    master_password = text_field_3.get()
+
+    if mg.check_master_pass(master_password):
+        if mg.store_password(_id = _id, password = password, master_password = master_password):
+            lbl_bottom.configure(text = "Password stored successfully!", fg = 'green')
+        else:
+            lbl_bottom.configure(text = "Error in storing password.\nKindly report to developer.", fg = 'green')
+    else:
+        lbl_bottom.configure(text = "Incorrect Master Password!", fg = 'red')
 
 # ---------- Functions : GUI Renders
 
@@ -139,6 +149,81 @@ def gui_store_password(root = None):
                      command = lambda: btn_store_password(text_field_1 = text_field_1, text_field_2 = text_field_2, text_field_3 = text_field_3, lbl_bottom = lbl_bottom))
     btn_store.grid(row = 3, column = 3, pady = 10)
 # ----------
+# func: to draw the UI for update password tab
+def gui_update_password(root = None):
+
+    gui_remove(root = root)
+
+    id_list = mg.fetch_ids()
+
+    lbl_1 = Label(root, text = "ID : ", font = "Calibri 12", wraplength = 300, justify = "center")
+    lbl_1.grid(row = 1, column = 0, pady = 10)
+
+    menu = StringVar()
+    menu.set("Select ID")
+
+    drop = OptionMenu(root, menu, *id_list)
+    drop.grid(row = 1, column = 1, columnspan = 2, pady = 10)
+
+    text_field_2 = Entry(root, show = "*", width = 30)
+    text_field_2.grid(row = 2, column = 1, columnspan = 2, pady = 10)
+
+    btn_generate = Button(root, text = "Generate",
+                          command = lambda: btn_generate_password(text_field_1 = text_field_2))
+    btn_generate.grid(row = 2, column = 0, pady = 10)
+
+    btn_cpy = Button(root, text = "Copy",
+                     command = lambda: btn_copy_text(text_field_1 = text_field_2, lbl_bottom = lbl_bottom))
+    btn_cpy.grid(row = 2, column = 3, pady = 10)
+
+    lbl_2 = Label(root, text = "Master\nPassword : ", font = "Calibri 12", wraplength = 300, justify = "center")
+    lbl_2.grid(row = 3, column = 0, pady = 10)
+
+    text_field_3 = Entry(root, show = "*", width = 30)
+    text_field_3.grid(row = 3, column = 1, columnspan = 2, pady = 10)
+
+    lbl_bottom = Label(root, font = "Calibri 12 bold", wraplength = 500, justify = "center", pady = 20)
+    lbl_bottom.grid(row = 4, column = 0, columnspan = 4)
+
+    btn_store = Button(root, text = "Update")#,
+                    #  command = lambda: btn_store_password(text_field_1 = text_field_1, text_field_2 = text_field_2, text_field_3 = text_field_3, lbl_bottom = lbl_bottom))
+    btn_store.grid(row = 3, column = 3, pady = 10)
+# ----------
+# func: to draw the UI for update password tab
+def gui_retrieve_password(root = None):
+
+    gui_remove(root = root)
+
+    id_list = mg.fetch_ids()
+
+    lbl_1 = Label(root, text = "ID : ", font = "Calibri 12", wraplength = 300, justify = "center")
+    lbl_1.grid(row = 1, column = 0, pady = 10)
+
+    menu = StringVar()
+    menu.set("Select ID")
+
+    drop = OptionMenu(root, menu, *id_list)
+    drop.grid(row = 1, column = 1, columnspan = 2, pady = 10)
+
+    lbl_2 = Label(root, text = "Master\nPassword : ", font = "Calibri 12", wraplength = 300, justify = "center")
+    lbl_2.grid(row = 2, column = 0, pady = 10)
+
+    text_field_3 = Entry(root, show = "*", width = 30)
+    text_field_3.grid(row = 2, column = 1, columnspan = 2, pady = 10)
+
+    btn_store = Button(root, text = "Retrieve")#,
+                    #  command = lambda: btn_store_password(text_field_1 = text_field_1, text_field_2 = text_field_2, text_field_3 = text_field_3, lbl_bottom = lbl_bottom))
+    btn_store.grid(row = 2, column = 3, pady = 10)
+
+    text_field_2 = Entry(root, show = "*", width = 30)
+    text_field_2.grid(row = 3, column = 1, columnspan = 2, pady = 10)
+
+    btn_cpy = Button(root, text = "Copy",
+                     command = lambda: btn_copy_text(text_field_1 = text_field_2, lbl_bottom = lbl_bottom))
+    btn_cpy.grid(row = 3, column = 3, pady = 10)
+
+    lbl_bottom = Label(root, font = "Calibri 12 bold", wraplength = 500, justify = "center", pady = 20)
+    lbl_bottom.grid(row = 4, column = 0, columnspan = 4)
 # ----------
 # func: to draw the UI for first time setup
 def gui_main_menu(root = None):
@@ -151,10 +236,12 @@ def gui_main_menu(root = None):
                             command = lambda: gui_store_password(root = root))
     btn_menu_store.grid(row = 0, column = 1, pady = 20)
 
-    btn_menu_update = Button(root, text = "Update\nPassword", padx = 20, pady = 20)
+    btn_menu_update = Button(root, text = "Update\nPassword", padx = 20, pady = 20,
+                             command = lambda: gui_update_password(root = root))
     btn_menu_update.grid(row = 0, column = 2, pady = 20)
 
-    btn_menu_retrieve = Button(root, text = "Retrieve\nPassword", padx = 20, pady = 20)
+    btn_menu_retrieve = Button(root, text = "Retrieve\nPassword", padx = 20, pady = 20,
+                               command = lambda: gui_retrieve_password(root = root))
     btn_menu_retrieve.grid(row = 0, column = 3, pady = 20)
 
 # ---------- Main
