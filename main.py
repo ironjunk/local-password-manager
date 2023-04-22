@@ -6,7 +6,7 @@
 from tkinter import Tk, PhotoImage
 
 from manager import check_first_time_setup, init_tables
-from gui import gui_first_setup, gui_main_menu
+from gui import gui_first_time_setup, gui_main_menu
 
 # ---------- Main
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     if check_first_time_setup():
         init_tables()
 
-        gui_first_setup(root = lpm_win)
+        gui_first_time_setup(root = lpm_win)
     else:
         gui_main_menu(root = lpm_win)
 
