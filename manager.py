@@ -3,194 +3,176 @@
 
 # ---------- Required Modules
 
-from random import randint, sample
 from sqlite3 import connect
+
 from passlib.hash import pbkdf2_sha256
+from passlib.pwd import genword
+
 from cryptocode import encrypt, decrypt
+
+# ---------- Check Text
+
+# func: to check if text does not contain any malicious code
+def check_text(text = None):
+
+    bad_keywords = ["create", "delete", "update", "alter", "and", "or", "not"]
+
+    for keyword in bad_keywords:
+        if keyword in text:
+            return False
+            
+    return True
 
 # ---------- Database Connection
 
-# func: to create connection to database
-def connection():
+# func: create connection to database
+def connection(db_name = "lpm"):
 
-    conn = connect(".\lpm.db")
+    conn = connect(".\{}.db".format(db_name))
 
     return conn
-# ----------
-# func: check connection status
-def check_status():
+
+# ---------- First Time Setup
+
+# func: check first time set up
+def check_first_time_setup():
 
     conn = connection()
-    c = conn.cursor()
+    cur = conn.cursor()
 
-    try:
-        c.execute("select name from sqlite_master where type = 'table' and name = 'admin'")
+    cur.execute("select name from sqlite_master where type = 'table'")
+    tables = cur.fetchall()
+    conn.close()
 
-        if c.fetchone()[0]:
-            conn.close()
-            return True
-        else:
-            conn.close()
-            return False
-    
-    except:
-        conn.close()
+    if tables == []:
+        return True
+    else:
         return False
+    
+# func: create 'tbl_admin' and 'tbl_password' tables
+def init_tables():
+
+    conn = connection()
+    cur = conn.cursor()
+
+    cur.execute("create table if not exists tbl_admin(master_password text)")
+    cur.execute("create table if not exists tbl_password(id text primary key, password text)")
+
+    conn.commit()
+    conn.close()
+    return True
 
 # ---------- Database Admin
 
-# func: to create new admin table
-def create_admin_table():
+# func: store the master password
+def store_master_pass(master_password = None):
 
-    conn = connection()
-    c = conn.cursor()
+    if check_text(text = master_password):
+        conn = connection()
+        cur = conn.cursor()
 
-    try:
-        c.execute("create table if not exists admin(master_pass text)")
+        cur.execute("insert into tbl_admin values(?)", (pbkdf2_sha256.hash(master_password),))
+
         conn.commit()
         conn.close()
-        
         return True
-    
-    except:
-        print("\nError creating the admin table! Kindly report the issue to the developer.")
-        conn.close()
-        
+    else:
         return False
-# ----------
-# func: to store the master password
-def store_master_pass(pass_master):
-    
-    if create_admin_table():
-        conn = connection()
-        c = conn.cursor()
 
-        try:
-            c.execute("insert into admin values(?)", (pbkdf2_sha256.hash(pass_master),))
-            conn.commit()
-            conn.close()
-
-            return True
-        
-        except:
-            print("\nError adding the master password to the admin table! Kindly report the issue to the developer.")
-            conn.close()
-        
-            return False
-
-    return False
-# ----------
-# func: check password to access database
-def check_master_pass(pass_master):
+# func: check master password
+def check_master_pass(master_password = None):
 
     conn = connection()
-    c = conn.cursor()
+    cur = conn.cursor()
 
-    c.execute("select master_pass from admin limit 1")
-    key = c.fetchone()[0]
+    cur.execute("select master_password from tbl_admin limit 1")
+    key = cur.fetchone()[0]
+    
     conn.close()
+    return pbkdf2_sha256.verify(master_password, key)
+    
+# ---------- Generate Password
 
-    return pbkdf2_sha256.verify(pass_master, key)
+def generate_password():
+    return genword(length = 16, charset = "ascii_72")
 
 # ---------- Store Password
 
-# func: to create new admin table
-def create_pass_table():
-
-    conn = connection()
-    c = conn.cursor()
-
-    try:
-        c.execute("create table if not exists password(id text, password text)")
-        conn.commit()
-        conn.close()
-        
-        return True
-    
-    except:
-        print("\nError creating the password table! Kindly report the issue to the developer.")
-        conn.close()
-        
-        return False
-# ----------
-# func: to store the master password
+# func: store the password
 def store_password(_id = None, password = None, master_password = None):
 
-    encrypted_password = encrypt(password, master_password)
+    if check_text(text = _id) and check_text(text = password):
+        encrypted_password = encrypt(password, master_password)
 
-    _ = create_pass_table()
+        conn = connection()
+        cur = conn.cursor()
 
-    conn = connection()
-    c = conn.cursor()
+        cur.execute("insert into tbl_password values(?, ?)", (_id, encrypted_password))
 
-    try:
-        c.execute("insert into password values(?, ?)", (_id, encrypted_password))
         conn.commit()
         conn.close()
-
         return True
-    
-    except:
-        print("\nError inserting record to the password table! Kindly report the issue to the developer.")
-        conn.close()
-    
+    else:
         return False
 
 # ---------- Update Password
-# func: to store the master password
+
+# func: update the password
+def update_password(_id = None, password = None, master_password = None):
+
+    if check_text(text = _id) and check_text(text = password):
+        encrypted_password = encrypt(password, master_password)
+
+        conn = connection()
+        cur = conn.cursor()
+
+        cur.execute("update tbl_password set password = ? where id = ?", (encrypted_password, _id))
+
+        conn.commit()
+        conn.close()
+        return True
+    else:
+        return False
+    
+# ---------- Retrieve Password
+
+# func: retrieve the password
+def retrieve_password(_id = None, master_password = None):
+
+    if check_text(text = _id):
+        conn = connection()
+        cur = conn.cursor()
+
+        cur.execute("select password from tbl_password where id = ?", (_id,))
+        encrypted_password = cur.fetchone()[0]
+        conn.close()
+
+        decrypted_password = decrypt(encrypted_password, master_password)
+        return decrypted_password
+    else:
+        return False
+
+# ---------- Fetch IDs
+
+# func: fetch stored IDs
 def fetch_ids():
 
     conn = connection()
-    c = conn.cursor()
+    cur = conn.cursor()
 
-    try:
-        c.execute("select id from password")
-        rows = c.fetchall()
-        conn.close()
+    cur.execute("select id from tbl_password")
+    rows = cur.fetchall()
+    conn.close()
 
+    if rows:
         id_list = [x[0] for x in rows]
+    else:
+        id_list = []
 
-        return sorted(id_list)
-    
-    except:
-        print("\nError inserting record to the password table! Kindly report the issue to the developer.")
-        conn.close()
-    
-        return []
-
-# ---------- Generate Password
-
-# func: to generate password
-def generate(w = 4, W = 4, d = 3, s = 5):
-    # func: to jumble generated password
-    def jumble(gen):
-        
-        jumbled = sample(gen, len(gen))
-        
-        return "".join(jumbled)
-    
-    spcl_char = "#_.@"
-
-    gen = ""
-
-    for _ in range(w):
-        gen = gen + chr(randint(97,122))
-
-    for _ in range(W):
-        gen = gen + chr(randint(65,90))
-
-    for _ in range(d):
-        gen = gen + chr(randint(48,57))
-
-    for _ in range(s):
-        gen = gen + spcl_char[randint(0,2)]
-
-    return jumble(gen)
+    return sorted(id_list)
 
 # ---------- Main
 
 if __name__ == "__main__":
-
-    fetch_ids()
     
     print("Error\t: Not a runnable program. \nNote\t: Run main.py instead.")

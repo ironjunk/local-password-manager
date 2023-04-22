@@ -3,47 +3,52 @@
 
 # ---------- Required Modules
 
-from datetime import datetime
-from pyperclip import copy
+from tkinter import Label, Entry, Button, OptionMenu, StringVar
 
 import manager as mg
-from tkinter import Label, Entry, Button, OptionMenu, StringVar
+from pyperclip import copy
 
 # ---------- Functions : Button Click Functions
 
-# func: to store the master password in the DB
-def btn_first_setup(text_field_1 = None, text_field_2 = None, lbl_bottom = None):
-    pass_master = text_field_1.get()
-    c_pass_master = text_field_2.get()
+# func: store the master password in the DB
+def btn_func_store_master_pass(tf_master_password = None, tf_master_password_confirm = None, lbl_msg = None):
+    master_password = tf_master_password.get()
+    master_password_confirm = tf_master_password_confirm.get()
 
-    if pass_master == c_pass_master:
-        success = mg.store_master_pass(pass_master)
-        
-        if success:
-            lbl_bottom.configure(text = "The Master Password has been set successfully!\nNote: Kindly restart the app.",
-                                fg = 'green')
+    try:
+        if master_password == master_password_confirm:
+            if mg.store_master_pass(master_password = master_password):
+                lbl_msg.configure(text = "The Master Password has been set successfully!\nNote: Kindly restart the app.",
+                                    fg = 'green')
+            else:
+                lbl_msg.configure(text = "Prohibited keywords not allowed in the text field!", fg = 'red')
         else:
-            lbl_bottom.configure(text = "The Master Password setup failed!\nKindly report to the developer.", fg = 'red')
-    else:
-        lbl_bottom.configure(text = "The passwords in both the fields do not match.\nPlease try again.", fg = 'red')
-# ----------
-# func: to generate password
-def btn_generate_password(text_field_1 = None):
-    password = mg.generate()
+            lbl_msg.configure(text = "The passwords in both the fields do not match.\nPlease try again.", fg = 'red')
+    except Exception as exc:
+        lbl_msg.configure(text = "The Master Password setup failed!\nERR: {}".format(exc), fg = 'red')
 
-    text_field_1.delete(0, "end")       # empty field
-    text_field_1.insert(0, password)    # insert into field
-# ----------
-# func: to copy text from the text field
-def btn_copy_text(text_field_1 = None, lbl_bottom = None):
-    text = text_field_1.get()
+# func: generate password
+def btn_func_generate_password(tf_password = None, lbl_msg = None):
+    try:
+        password = mg.generate_password()
 
-    copy(text = text)
+        tf_password.delete(0, "end")       # empty field
+        tf_password.insert(0, password)    # insert into field
+    except Exception as exc:
+        lbl_msg.configure(text = "The Password Generation failed!\nERR: {}".format(exc), fg = 'red')
 
-    lbl_bottom.configure(text = "Password copied to clipboard!", fg = 'green')
-# ----------
-# func: to copy text from the text field
-def btn_store_password(text_field_1 = None, text_field_2 = None, text_field_3 = None, lbl_bottom = None):
+# func: copy text from the text field
+def btn_func_copy_text(tf_password = None, lbl_msg = None):
+    try:
+        text = tf_password.get()
+        copy(text = text)
+
+        lbl_msg.configure(text = "Password copied to clipboard!", fg = 'green')
+    except Exception as exc:
+        lbl_msg.configure(text = "Failed to copy!\nERR: {}".format(exc), fg = 'red')
+
+# func: store password
+def btn_func_store_password(text_field_1 = None, text_field_2 = None, text_field_3 = None, lbl_bottom = None):
     _id = text_field_1.get()
     password = text_field_2.get()
     master_password = text_field_3.get()

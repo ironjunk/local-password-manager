@@ -5,46 +5,30 @@
 
 from tkinter import Tk, PhotoImage
 
-from manager import check_status
+from manager import check_first_time_setup, init_tables
 from gui import gui_first_setup, gui_main_menu
-from getpass import getpass
 
 # ---------- Main
 
 if __name__ == "__main__":
 
-    root = Tk()
-    root.title("Local Password Manager")
-    root.geometry('500x400')
+    app_version = 1
+
+    lpm_win = Tk()
+    lpm_win.title("Local Password Manager (v{})".format(app_version))
+    lpm_win.geometry('500x400')
 
     favicon = PhotoImage(file = "favicon.png")
-    root.iconphoto(False, favicon)
+    lpm_win.iconphoto(False, favicon)
 
-    if not check_status():
-        gui_first_setup(root = root)
+    if check_first_time_setup():
+        init_tables()
+
+        gui_first_setup(root = lpm_win)
     else:
-        gui_main_menu(root = root)
-        
+        gui_main_menu(root = lpm_win)
 
-    # root.grid_rowconfigure(0, weight = 1)
-    # root.grid_rowconfigure(1, weight = 1)
-    # root.grid_rowconfigure(2, weight = 1)
+    for ncol in range(4):
+        lpm_win.grid_columnconfigure(ncol, weight = 1)
 
-    root.grid_columnconfigure(0, weight = 1)
-    root.grid_columnconfigure(1, weight = 1)
-    root.grid_columnconfigure(2, weight = 1)
-    root.grid_columnconfigure(3, weight = 1)
-
-    root.mainloop()
-
-    # for x in sorted(list(font.families())):
-    #     print(x)
-
-    # if not mg.check_status():
-    #     first_setup()
-    # else:
-    #     pass_master = getpass("Enter Master Password: ")
-        
-    #     if not mg.check_master_pass(pass_master):
-    #         print("Invalid Password !")
-    #         exit()
+    lpm_win.mainloop()
