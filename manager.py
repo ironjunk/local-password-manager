@@ -14,11 +14,12 @@ from cryptocode import encrypt, decrypt
 
 # func: to check if text does not contain any malicious code
 def check_text(text = None):
+    text_split = text.split(" ")
 
     bad_keywords = ["create", "delete", "update", "alter", "and", "or", "not"]
 
-    for keyword in bad_keywords:
-        if keyword in text:
+    for word in text_split:
+        if word in bad_keywords:
             return False
             
     return True
