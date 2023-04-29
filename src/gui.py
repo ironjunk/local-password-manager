@@ -5,7 +5,7 @@
 
 from tkinter import Label, Entry, Button, OptionMenu, StringVar
 
-import manager as mg
+import src.manager as mg
 from pyperclip import copy
 
 # ---------- Global Vars
@@ -21,11 +21,11 @@ def btn_func_store_master_pass(tf_master_password = None, tf_master_password_con
 
     try:
         if master_password == master_password_confirm:
-            if mg.store_master_pass(master_password = master_password):
+            if master_password != "" and master_password_confirm != "" and mg.store_master_pass(master_password = master_password):
                 lbl_msg.configure(text = "The master password has been set successfully!\nNote: Kindly restart the app.",
                                     fg = 'green')
             else:
-                lbl_msg.configure(text = "Prohibited keywords not allowed in the text field!", fg = 'red')
+                lbl_msg.configure(text = "Prohibited keywords/Blank texts not allowed in the text field!", fg = 'red')
         else:
             lbl_msg.configure(text = "The passwords in both the fields do not match.\nPlease try again.", fg = 'red')
     except Exception as exc:
@@ -59,10 +59,10 @@ def btn_func_store_password(tf_id = None, tf_password = None, tf_master_password
 
     try:
         if mg.check_master_pass(master_password = master_password):
-            if mg.store_password(_id = _id, password = password, master_password = master_password):
+            if _id != "" and password != "" and mg.store_password(_id = _id, password = password, master_password = master_password):
                 lbl_msg.configure(text = "Password stored successfully!", fg = 'green')
             else:
-                lbl_msg.configure(text = "Prohibited keywords not allowed in the text field!", fg = 'red')
+                lbl_msg.configure(text = "Prohibited keywords/Blank texts not allowed in the text field!", fg = 'red')
         else:
             lbl_msg.configure(text = "Incorrect Master Password!", fg = 'red')
     except Exception as exc:
@@ -76,10 +76,10 @@ def btn_func_update_password(_id = None, tf_password = None, tf_master_password 
 
     try:
         if mg.check_master_pass(master_password = master_password):
-            if mg.update_password(_id = _id, password = password, master_password = master_password):
+            if _id != "" and password != "" and mg.update_password(_id = _id, password = password, master_password = master_password):
                 lbl_msg.configure(text = "Password updated successfully!", fg = 'green')
             else:
-                lbl_msg.configure(text = "Prohibited keywords not allowed in the text field!", fg = 'red')
+                lbl_msg.configure(text = "Prohibited keywords/Blank texts not allowed in the text field!", fg = 'red')
         else:
             lbl_msg.configure(text = "Incorrect Master Password!", fg = 'red')
     except Exception as exc:
