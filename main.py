@@ -5,8 +5,8 @@
 
 from tkinter import Tk, PhotoImage
 
-from manager import check_first_time_setup, init_tables
-from gui import gui_first_time_setup, gui_main_menu
+from src.manager import check_first_time_setup, init_tables
+from src.gui import gui_first_time_setup, gui_main_menu
 
 # ---------- Main
 
