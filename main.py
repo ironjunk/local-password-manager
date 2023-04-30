@@ -12,7 +12,7 @@ from src.gui import gui_first_time_setup, gui_main_menu
 
 if __name__ == "__main__":
 
-    app_version = 1
+    app_version = "1.0.1"
 
     lpm_win = Tk()
     lpm_win.title("Local Password Manager (v{})".format(app_version))
